@@ -6,18 +6,14 @@ const path = require('path')
 const cookieParser = require('cookie-parser')
 const logger = require('morgan')
 const passport = require('passport')
-const mongoose = require('mongoose')
-
+const connectDB = require('./config/db')
 const indexRouter = require('./routes/index')
 const postRouter = require('./routes/post')
 const usersRouter = require('./routes/users')
 
 const app = express()
 
-// Set up mongoose connection
-mongoose.connect(process.env.MONGO_DB, { useNewUrlParser: true, useUnifiedTopology: true })
-const db = mongoose.connection
-db.on('error', console.error.bind(console, 'MongoDB connection error:'))
+connectDB()
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
@@ -30,8 +26,8 @@ app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/', indexRouter)
-app.use('/post', postRouter)
-app.use('/users', usersRouter)
+app.use('/api/v1/posts', postRouter)
+app.use('/api/v1/users', usersRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
