@@ -2,26 +2,27 @@ const Comment = require('../models/comment')
 const Post = require('../models/post')
 
 const User = require('../models/user')
-const validation = require('../validation/validation')
 const { validationResult } = require('express-validator')
 const authMiddleware = require('../middleware/auth')
+const validationMiddleware = require('../middleware/validation')
 
-// @desc    Get all comments
+// @desc    Get all comments for one post
 // @route   GET /api/v1/posts/:postid/comments/
 // @access  Public
 exports.getAllComments = async (req, res, next) => {
   try {
-    const comments = await Comment.find().populate('author').sort({ date: -1 })
+    const post = await Post.findById(req.params.postid).populate('comments').sort({ date: -1 })
+    const comments = post.comments
+    // const comments = await Comments.find().where('_id').in(commentsIDs)
+    // const comments = await Comments.find({ _id: commentsIDs })
+
     return res.status(200).json({
       success: true,
       count: comments.length,
       data: comments
     })
   } catch (err) {
-    return res.status(500).json({
-      success: false,
-      error: 'Server Error'
-    })
+    return next(err)
   }
 }
 
@@ -30,39 +31,27 @@ exports.getAllComments = async (req, res, next) => {
 // @access  Private
 exports.addComment = [
   authMiddleware.isAuth,
-
-  validation.comment(),
+  validationMiddleware.comment(),
+  validationMiddleware.validationResult,
 
   async (req, res, next) => {
-    const validationErrors = validationResult(req)
+    try {
+      const comment = await new Comment({
+        content: req.body.content,
+        author: req.user
+      }).save()
+      // Add comment to post
+      await Post.findByIdAndUpdate(req.params.postid, { $push: { comments: comment } }, {})
 
-    if (!validationErrors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        error: 'Validation error',
-        validationErrors: validationErrors.array()
+      return res.status(200).json({
+        success: true,
+        data: comment
       })
-    } else {
-      try {
-        const comment = await new Comment({
-          content: req.body.content,
-          author: req.user
-        }).save()
-        // Add comment to post
-        await Post.findByIdAndUpdate(req.params.postid, { $push: { comments: comment } }, {})
-
-        return res.status(200).json({
-          success: true,
-          data: comment
-        })
-      } catch (err) {
-        return res.status(500).json({
-          success: false,
-          error: 'Server Error'
-        })
-      }
+    } catch (err) {
+      return next(err)
     }
   }
+
 ]
 
 // @desc    Get one comment
@@ -89,10 +78,7 @@ exports.getComment = async (req, res, next) => {
         error: 'Invalid Comment ID'
       })
     }
-    return res.status(500).json({
-      success: false,
-      error: 'Server Error'
-    })
+    return next(err)
   }
 }
 
@@ -121,10 +107,7 @@ exports.deleteComment = [
           error: 'Invalid comment ID'
         })
       }
-      return res.status(500).json({
-        success: false,
-        error: 'Server Error'
-      })
+      return next(err)
     }
   }
 ]
@@ -135,34 +118,29 @@ exports.deleteComment = [
 exports.updateComment = [
   authMiddleware.isAuth,
 
-  validation.comment(),
+  validationMiddleware.comment(),
+  validationMiddleware.validationResult,
 
   async (req, res, next) => {
-    const validationErrors = validationResult(req)
-
-    if (!validationErrors.isEmpty()) {
-      return res.status(400).json({
-        success: false,
-        error: 'Validation error',
-        validationErrors: validationErrors.array()
-      })
-    } else {
-      const comment = {
-        content: req.body.content
-      }
-      try {
-        // Update comment
-        await Comment.findByIdAndUpdate(req.params.commentid, comment, {})
-        return res.status(200).json({
-          success: true,
-          data: {}
-        })
-      } catch (err) {
-        return res.status(500).json({
+    const comment = {
+      content: req.body.content
+    }
+    try {
+      // Update comment
+      const updatedComment = await Comment.findByIdAndUpdate(req.params.commentid, comment, { new: true })
+      if (!updatedComment) {
+        return res.status(404).json({
           success: false,
-          error: 'Server Error'
+          error: 'No comment found'
         })
       }
+      return res.status(200).json({
+        success: true,
+        data: updatedComment
+      })
+    } catch (err) {
+      return next(err)
     }
   }
+
 ]
