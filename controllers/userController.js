@@ -1,6 +1,5 @@
 const User = require('../models/user')
 const validationMiddleware = require('../middleware/validation')
-const authMiddleware = require('../middleware/auth')
 const passport = require('passport')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
@@ -57,7 +56,6 @@ exports.login = [
   }
 ]
 
-// Generate JWT
 const generateToken = (user) => {
   const payload = {
     sub: user._id,
