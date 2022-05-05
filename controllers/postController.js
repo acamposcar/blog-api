@@ -1,6 +1,4 @@
 const Post = require('../models/post')
-const User = require('../models/user')
-const authMiddleware = require('../middleware/auth')
 const validationMiddleware = require('../middleware/validation')
 
 // @desc    Get all posts
@@ -8,7 +6,7 @@ const validationMiddleware = require('../middleware/validation')
 // @access  Public
 exports.getAllPosts = async (req, res, next) => {
   try {
-    const posts = await Post.find().populate('author').sort({ date: -1 })
+    const posts = await Post.find().populate('author', 'username').sort({ date: -1 })
     return res.status(200).json({
       success: true,
       count: posts.length,
@@ -23,7 +21,6 @@ exports.getAllPosts = async (req, res, next) => {
 // @route   POST /api/v1/posts
 // @access  Private
 exports.addPost = [
-  authMiddleware.isAuth,
   validationMiddleware.post(),
   validationMiddleware.validationResult,
 
@@ -32,7 +29,7 @@ exports.addPost = [
       const post = await new Post({
         title: req.body.title,
         content: req.body.content,
-        author: req.user,
+        author: req.user._id,
         published: req.body.published === 'true'
       }).save()
 
@@ -51,7 +48,7 @@ exports.addPost = [
 // @access  Public
 exports.getPost = async (req, res, next) => {
   try {
-    const post = await Post.findById(req.params.postid).populate('author').populate('comments')
+    const post = await Post.findById(req.params.postid).populate('author', 'username').populate('comments')
 
     if (!post) {
       return res.status(404).json({
@@ -78,7 +75,6 @@ exports.getPost = async (req, res, next) => {
 // @route   DELETE /api/v1/post/:postid
 // @access  Public
 exports.deletePost = [
-  authMiddleware.isAuth,
   async (req, res, next) => {
     try {
       const post = await Post.findByIdAndRemove(req.params.postid)
@@ -108,7 +104,6 @@ exports.deletePost = [
 // @route   PUT /api/v1/posts/:postid
 // @access  Private
 exports.updatePost = [
-  authMiddleware.isAuth,
   validationMiddleware.post(),
   validationMiddleware.validationResult,
 
