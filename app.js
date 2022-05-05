@@ -15,6 +15,10 @@ const app = express()
 
 connectDB()
 
+// Passport configuration
+require('./config/passport')
+app.use(passport.initialize())
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'ejs')
@@ -43,7 +47,7 @@ app.use(function (err, req, res, next) {
   // render the error page
   res.status(err.status || 500)
   res.json({
-    message: err.message,
+    message: 'Server Error',
     stack: process.env.NODE_ENV === 'production' ? null : err.stack
   })
 })
