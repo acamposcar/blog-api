@@ -7,6 +7,8 @@ const jwt = require('jsonwebtoken')
 exports.register = [
   validationMiddleware.name(),
   validationMiddleware.usernamePassword(),
+  validationMiddleware.validationResult,
+
   async (req, res, next) => {
     const userExists = await User.findOne({ username: req.body.username })
     if (userExists) {
@@ -36,6 +38,7 @@ exports.register = [
 
 exports.login = [
   validationMiddleware.usernamePassword(),
+  validationMiddleware.validationResult,
 
   async (req, res, next) => {
     passport.authenticate('local', { session: false }, (err, user) => {
@@ -55,6 +58,13 @@ exports.login = [
     })(req, res)
   }
 ]
+
+exports.currentUser = (req, res, next) => {
+  return res.status(200).json({
+    success: true,
+    data: req.user
+  })
+}
 
 const generateToken = (user) => {
   const payload = {

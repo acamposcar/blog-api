@@ -1,9 +1,8 @@
 const express = require('express')
 const router = express.Router()
+const userController = require('../controllers/userController')
+const isAuth = require('../middleware/auth').isAuth
 
-/* GET users listing. */
-router.get('/', function (req, res, next) {
-  res.send('respond with a resource')
-})
+router.route('/').get(isAuth, userController.currentUser)
 
 module.exports = router
