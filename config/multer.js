@@ -11,7 +11,7 @@ const storage = multer.diskStorage({
   }
 })
 
-const upload = multer({
+const config = multer({
   storage,
   fileFilter: (req, file, cb) => {
     if (file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg') {
@@ -26,5 +26,17 @@ const upload = multer({
     fileSize: 1024 * 1024
   }
 })
+
+const upload = (req, res, next) => {
+  config.single('avatar')(req, res, (err) => {
+    if (err) {
+      return res.status(400).json({
+        success: false,
+        error: err.message
+      })
+    }
+    next()
+  })
+}
 
 module.exports = upload

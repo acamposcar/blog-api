@@ -71,7 +71,7 @@ exports.currentUser = (req, res, next) => {
 }
 
 exports.avatar = [
-  upload.single('avatar'),
+  upload,
   async (req, res, next) => {
     const user = {
       avatar: req.file.filename
