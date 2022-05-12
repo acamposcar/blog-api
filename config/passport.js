@@ -29,7 +29,7 @@ passport.use(
 passport.use(
   new LocalStrategy({ session: false }, async (username, password, done) => {
     try {
-      const user = await User.findOne({ username })
+      const user = await User.findOne({ username }).select('+password')
       if (!user) {
         // Incorrect username
         return done(null, false)

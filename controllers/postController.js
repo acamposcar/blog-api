@@ -6,7 +6,7 @@ const validationMiddleware = require('../middleware/validation')
 // @access  Public
 exports.getAllPosts = async (req, res, next) => {
   try {
-    const posts = await Post.find().populate('author', 'username').sort({ date: -1 })
+    const posts = await Post.find().populate('author').sort({ date: -1 })
     return res.status(200).json({
       success: true,
       count: posts.length,
@@ -48,7 +48,13 @@ exports.addPost = [
 // @access  Public
 exports.getPost = async (req, res, next) => {
   try {
-    const post = await Post.findById(req.params.postid).populate('author', 'username').populate('comments')
+    const post = await Post.findById(req.params.postid).populate('author').populate({
+      path: 'comments',
+      options: { sort: { date: -1 } },
+      populate: {
+        path: 'author'
+      }
+    })
 
     if (!post) {
       return res.status(404).json({

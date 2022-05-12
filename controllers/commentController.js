@@ -7,7 +7,7 @@ const validationMiddleware = require('../middleware/validation')
 // @access  Public
 exports.getAllComments = async (req, res, next) => {
   try {
-    const post = await Post.findById(req.params.postid).populate('comments').sort({ date: -1 })
+    const post = await Post.findById(req.params.postid).populate({ path: 'comments', options: { sort: { date: -1 } } })
     const comments = post.comments
     // const comments = await Comments.find().where('_id').in(commentsIDs)
     // const comments = await Comments.find({ _id: commentsIDs })
@@ -54,7 +54,7 @@ exports.addComment = [
 // @access  Public
 exports.getComment = async (req, res, next) => {
   try {
-    const comment = await Comment.findById(req.params.commentid).populate('author', 'username')
+    const comment = await Comment.findById(req.params.commentid).populate('author')
 
     if (!comment) {
       return res.status(404).json({
