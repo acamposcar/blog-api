@@ -1,5 +1,5 @@
 *.rest
-
+/public/uploads
 # Logs
 logs
 *.log

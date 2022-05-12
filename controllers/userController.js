@@ -3,6 +3,7 @@ const validationMiddleware = require('../middleware/validation')
 const passport = require('passport')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const upload = require('../config/multer')
 
 exports.register = [
   validationMiddleware.name(),
@@ -50,10 +51,13 @@ exports.login = [
           error: 'Invalid credentials'
         })
       }
-      const token = generateToken(user)
+
+      const expirationDays = 1
+      const expirationTimeInSeconds = expirationDays * 24 * 60 * 60
+      const token = generateToken(user, expirationTimeInSeconds)
       return res.status(201).json({
         success: true,
-        data: { token }
+        data: { token, username: user.username, name: user.name, admin: user.admin, expiresIn: expirationTimeInSeconds }
       })
     })(req, res)
   }
@@ -66,10 +70,34 @@ exports.currentUser = (req, res, next) => {
   })
 }
 
-const generateToken = (user) => {
+exports.avatar = [
+  upload.single('avatar'),
+  async (req, res, next) => {
+    const user = {
+      avatar: req.file.filename
+    }
+    try {
+      const updatedUser = await User.findByIdAndUpdate(req.user._id, user, { new: true })
+      if (!updatedUser) {
+        return res.status(404).json({
+          success: false,
+          error: 'No user found'
+        })
+      }
+      return res.status(200).json({
+        success: true,
+        data: req.file.filename
+      })
+    } catch (err) {
+      return next(err)
+    }
+  }
+]
+
+const generateToken = (user, expirationTimeInSeconds) => {
   const payload = {
     sub: user._id,
     username: user.username
   }
-  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '30d' })
+  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: expirationTimeInSeconds })
 }
