@@ -7,7 +7,8 @@ const isAuth = (req, res, next) => {
       // Error related to the validity of the token (error in its signature, expired...)
       return res.status(401).json({
         success: false,
-        error: info.message
+        error: 'Unauthorized: Token error'
+        // error: info.message
       })
     }
     if (!user) {
