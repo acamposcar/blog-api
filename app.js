@@ -32,14 +32,14 @@ app.use(logger('dev'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
-app.use(express.static(path.join(__dirname, '../client/build')))
+app.use(express.static(path.join(__dirname, 'client/build')))
 
 app.use('/api', indexRouter)
 app.use('/api/v1/posts', postRouter)
 app.use('/api/v1/users', usersRouter)
 // Redirect to react for any unknown path
 app.use('/*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/build', 'index.html'))
+  res.sendFile(path.join(__dirname, 'client/build', 'index.html'))
 })
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -56,7 +56,7 @@ app.use(function (err, req, res, next) {
   res.status(err.status || 500)
   res.json({
     message: 'Server Error',
-    stack: process.env.NODE_ENV === err.stack ? null : err.stack
+    stack: process.env.NODE_ENV === 'production' ? null : err.stack
   })
 })
 
