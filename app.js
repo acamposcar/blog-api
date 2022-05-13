@@ -10,10 +10,15 @@ const connectDB = require('./config/db')
 const indexRouter = require('./routes/index')
 const postRouter = require('./routes/post')
 const usersRouter = require('./routes/users')
+const helmet = require('helmet')
+const compression = require('compression')
 
 const app = express()
 
 connectDB()
+
+app.use(helmet())
+app.use(compression())
 
 // Passport configuration
 require('./config/passport')
