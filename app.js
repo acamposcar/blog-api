@@ -17,7 +17,11 @@ const app = express()
 
 connectDB()
 
-app.use(helmet())
+app.use(helmet({
+  // Without setting this, avatar preview throws an error
+  contentSecurityPolicy: false
+}))
+
 app.use(compression())
 
 // Passport configuration
