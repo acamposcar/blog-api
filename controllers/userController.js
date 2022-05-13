@@ -5,6 +5,9 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const upload = require('../config/multer')
 
+const expirationDays = 2
+const expirationTimeInSeconds = expirationDays * 24 * 60 * 60
+
 exports.register = [
   validationMiddleware.name(),
   validationMiddleware.usernamePassword(),
@@ -26,13 +29,14 @@ exports.register = [
         password: hasedPassword
       }).save()
 
-      const expirationDays = 1
-      const expirationTimeInSeconds = expirationDays * 24 * 60 * 60
       const token = generateToken(user, expirationTimeInSeconds)
+
+      const userWithoutPassword = user.toObject()
+      delete userWithoutPassword.password
 
       return res.status(201).json({
         success: true,
-        data: { token }
+        data: { token, user: userWithoutPassword, expiresIn: expirationTimeInSeconds }
       })
     } catch (err) {
       return next(err)
@@ -55,8 +59,6 @@ exports.login = [
         })
       }
 
-      const expirationDays = 1
-      const expirationTimeInSeconds = expirationDays * 24 * 60 * 60
       const token = generateToken(user, expirationTimeInSeconds)
 
       // Remove password before returning user data
