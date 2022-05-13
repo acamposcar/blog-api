@@ -47,8 +47,10 @@ exports.name = () => [
 
 exports.post = () => [
   body('title', 'Title must be between 1 and 1000 characters').trim().isLength({ min: 1, max: 1000 }).escape(),
-  body('content', 'Content must not be empty').trim().isLength({ min: 1 }).escape(),
-  body('published', 'Published must be a boolean').trim().isBoolean().escape()
+  // Content not escaped to avoid markdown conversion errors
+  body('content', 'Content must not be empty').trim().isLength({ min: 1 }),
+  body('published', 'Published must be a boolean').trim().isBoolean().escape(),
+  body('summary', 'Summary must not be empty').trim().isLength({ min: 1 })
 ]
 
 exports.comment = () => [

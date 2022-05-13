@@ -10,7 +10,9 @@ const PostSchema = new Schema(
     date: { type: Date, required: true, default: Date.now },
     author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     comments: [{ type: Schema.Types.ObjectId, ref: 'Comment' }],
-    published: { type: Boolean, required: true }
+    published: { type: Boolean, required: true },
+    image: { type: String, required: true },
+    summary: { type: String, required: true }
   }
 )
 

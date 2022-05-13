@@ -28,7 +28,7 @@ const config = multer({
 })
 
 const upload = (req, res, next) => {
-  config.single('avatar')(req, res, (err) => {
+  config.single('image')(req, res, (err) => {
     if (err) {
       return res.status(400).json({
         success: false,
