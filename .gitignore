@@ -1,6 +1,5 @@
 *.rest
 /public/uploads
-/client/build
 # Logs
 logs
 *.log
