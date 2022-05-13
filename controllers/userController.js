@@ -21,12 +21,15 @@ exports.register = [
     try {
       const hasedPassword = await bcrypt.hash(req.body.password, 10)
       const user = await new User({
-        name: req.body.username,
+        name: req.body.name,
         username: req.body.username,
         password: hasedPassword
       }).save()
 
-      const token = generateToken(user)
+      const expirationDays = 1
+      const expirationTimeInSeconds = expirationDays * 24 * 60 * 60
+      const token = generateToken(user, expirationTimeInSeconds)
+
       return res.status(201).json({
         success: true,
         data: { token }
@@ -55,9 +58,14 @@ exports.login = [
       const expirationDays = 1
       const expirationTimeInSeconds = expirationDays * 24 * 60 * 60
       const token = generateToken(user, expirationTimeInSeconds)
+
+      // Remove password before returning user data
+      const userWithoutPassword = user.toObject()
+      delete userWithoutPassword.password
+      console.log(user)
       return res.status(201).json({
         success: true,
-        data: { token, username: user.username, name: user.name, admin: user.admin, expiresIn: expirationTimeInSeconds }
+        data: { token, user: userWithoutPassword, expiresIn: expirationTimeInSeconds }
       })
     })(req, res)
   }
@@ -73,9 +81,17 @@ exports.currentUser = (req, res, next) => {
 exports.avatar = [
   upload,
   async (req, res, next) => {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        error: 'Error uploading file'
+      })
+    }
+
     const user = {
       avatar: req.file.filename
     }
+
     try {
       const updatedUser = await User.findByIdAndUpdate(req.user._id, user, { new: true })
       if (!updatedUser) {
