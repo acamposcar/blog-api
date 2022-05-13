@@ -62,7 +62,6 @@ exports.login = [
       // Remove password before returning user data
       const userWithoutPassword = user.toObject()
       delete userWithoutPassword.password
-      console.log(user)
       return res.status(201).json({
         success: true,
         data: { token, user: userWithoutPassword, expiresIn: expirationTimeInSeconds }

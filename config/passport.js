@@ -12,7 +12,6 @@ opts.secretOrKey = process.env.JWT_SECRET
 passport.use(
   new JwtStrategy(opts, async (jwtPayload, done) => {
     try {
-      console.log(`Payload: ${JSON.stringify(jwtPayload)}`)
       const user = await User.findById(jwtPayload.sub)
       if (!user) {
         // User not found
