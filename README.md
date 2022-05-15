@@ -59,3 +59,22 @@ Demo credentials:
 - Comment on posts (registered users)
 - Fully responsive user interface
 
+## Installation
+
+1. Clone the project
+
+2. Install all dependencies
+
+'''bash 
+npm install
+'''
+
+3. Start your MongoDB
+
+4. Rename .env.example to .env and configure environment variables
+
+5. Run server
+'''bash
+npm run dev
+'''
+
