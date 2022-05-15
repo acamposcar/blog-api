@@ -1,9 +1,17 @@
 # DEV Blog (API Backend) - MERN Stack
 Blogging website made using Express and JWT authentication in the backend and React in the frontend
 
-👉[Demo](https://blog-react-express-api.herokuapp.com/)
+
+
 
 👉[Frontend Repo](https://github.com/acamposcar/blog-frontend)
+
+👉[Demo](https://blog-react-express-api.herokuapp.com/)
+
+Demo credentials:
+- User: normalUser
+- Password: user
+
 
 ## Screenshots
 
