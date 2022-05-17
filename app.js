@@ -10,6 +10,7 @@ const connectDB = require('./config/db')
 const indexRouter = require('./routes/index')
 const postRouter = require('./routes/post')
 const usersRouter = require('./routes/users')
+const commentRouter = require('./routes/comment')
 const helmet = require('helmet')
 const compression = require('compression')
 
@@ -37,11 +38,18 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use(express.static(path.join(__dirname, 'client/build')))
+app.use(express.static(path.join(__dirname, 'client/dashboard')))
 
 app.use('/api', indexRouter)
 app.use('/api/v1/posts', postRouter)
 app.use('/api/v1/users', usersRouter)
+app.use('/api/v1/comments', commentRouter)
 // Redirect to react for any unknown path
+
+app.use('/dashboard', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client/dashboard', 'index.html'))
+})
+
 app.use('/*', (req, res) => {
   res.sendFile(path.join(__dirname, 'client/build', 'index.html'))
 })

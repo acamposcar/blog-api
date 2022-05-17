@@ -3,9 +3,27 @@ const Post = require('../models/post')
 const validationMiddleware = require('../middleware/validation')
 
 // @desc    Get all comments for one post
-// @route   GET /api/v1/posts/:postid/comments/
+// @route   GET /api/v1/comments/
 // @access  Public
 exports.getAllComments = async (req, res, next) => {
+  try {
+    const postsWithComments = await Post.find().populate({ path: 'comments', options: { sort: { date: -1 } } })
+    // const comments = await Comments.find().where('_id').in(commentsIDs)
+    // const comments = await Comments.find({ _id: commentsIDs })
+
+    return res.status(200).json({
+      success: true,
+      data: postsWithComments
+    })
+  } catch (err) {
+    return next(err)
+  }
+}
+
+// @desc    Get all comments for one post
+// @route   GET /api/v1/posts/:postid/comments/
+// @access  Public
+exports.getAllPostComments = async (req, res, next) => {
   try {
     const post = await Post.findById(req.params.postid).populate({ path: 'comments', options: { sort: { date: -1 } } })
     const comments = post.comments

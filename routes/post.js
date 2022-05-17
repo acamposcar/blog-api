@@ -9,7 +9,7 @@ router.route('/').get(postController.getAllPosts).post(isAdmin, postController.a
 
 router.route('/:postid').get(postController.getPost).put(isAdmin, postController.updatePost).delete(isAdmin, postController.deletePost)
 
-router.route('/:postid/comments').get(commentController.getAllComments).post(isAuth, commentController.addComment)
+router.route('/:postid/comments').get(commentController.getAllPostComments).post(isAuth, commentController.addComment)
 
 router.route('/:postid/comments/:commentid').get(commentController.getComment).put(isAdmin, commentController.updateComment).delete(isAdmin, commentController.deleteComment)
 
