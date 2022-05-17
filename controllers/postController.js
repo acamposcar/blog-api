@@ -118,6 +118,7 @@ exports.deletePost = [
 // @route   PUT /api/v1/posts/:postid
 // @access  Private
 exports.updatePost = [
+  upload,
   validationMiddleware.post(),
   validationMiddleware.validationResult,
 
@@ -128,6 +129,8 @@ exports.updatePost = [
       published: req.body.published === 'true',
       summary: req.body.summary
     }
+    if (req.file) post.image = req.file.filename
+
     try {
       // Update post
       const updatedPost = await Post.findByIdAndUpdate(req.params.postid, post, { new: true })
